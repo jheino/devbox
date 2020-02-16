@@ -1,0 +1,6 @@
+- name: download binary
+  get_url:
+    url: https://github.com/99designs/aws-vault/releases/download/v{{ aws_vault_version }}/aws-vault-linux-amd64
+    dest: /usr/local/bin/aws-vault
+    checksum: "{{ aws_vault_checksum }}"
+    mode: 0755

@@ -1,0 +1,32 @@
+- name: check version
+  command: /usr/local/bin/fzf --version
+  failed_when: false
+  changed_when: fzf.rc > 0 or fzf.stdout.split()[0] != fzf_version
+  register: fzf
+- when: fzf.changed
+  block:
+    - name: create temporary directory
+      tempfile:
+        state: directory
+      register: tempfile
+    - name: download package
+      get_url:
+        url: https://github.com/junegunn/fzf-bin/releases/download/{{ fzf_version }}/fzf-{{ fzf_version }}-linux_amd64.tgz
+        dest: "{{ tempfile.path }}/fzf-{{ fzf_version }}-linux_amd64.tgz"
+        checksum: "{{ fzf_checksum }}"
+    - name: extract package
+      unarchive:
+        src: "{{ tempfile.path }}/fzf-{{ fzf_version }}-linux_amd64.tgz"
+        dest: "{{ tempfile.path }}"
+        remote_src: yes
+    - name: install binary
+      copy:
+        src: "{{ tempfile.path }}/fzf"
+        dest: /usr/local/bin/fzf
+        remote_src: yes
+        mode: 0755
+  always:
+    - name: remove temporary directory
+      file:
+        path: "{{ tempfile.path }}"
+        state: absent

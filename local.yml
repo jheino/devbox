@@ -1,0 +1,25 @@
+- hosts: localhost
+  pre_tasks:
+    - name: check if we are running under WSL
+      set_fact:
+        is_wsl: "{{ 'Microsoft' in ansible_kernel }}"
+    - name: install packages
+      apt:
+        name: "{{ apt_packages }}"
+  roles:
+    - awscli
+    - aws-iam-authenticator
+    - aws-sam-cli
+    - aws-vault
+    - borg
+    - docker
+    - fzf
+    - go
+    - kubectl
+    - kustomize
+    - role: microk8s
+      when: not is_wsl
+    - packer
+    - ripgrep
+    - terraform
+    - xsv

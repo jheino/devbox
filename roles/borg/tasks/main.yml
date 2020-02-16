@@ -1,0 +1,6 @@
+- name: download binary
+  get_url:
+    url: https://github.com/borgbackup/borg/releases/download/{{ borg_version }}/borg-linux64
+    dest: /usr/local/bin/borg
+    checksum: "{{ borg_checksum }}"
+    mode: 0755

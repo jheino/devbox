@@ -1,0 +1,32 @@
+- name: check version
+  command: /usr/local/bin/terraform version
+  failed_when: false
+  changed_when: terraform.rc > 0 or terraform.stdout_lines[0] != "Terraform v" + terraform_version
+  register: terraform
+- when: terraform.changed
+  block:
+    - name: create temporary directory
+      tempfile:
+        state: directory
+      register: tempfile
+    - name: download package
+      get_url:
+        url: https://releases.hashicorp.com/terraform/{{ terraform_version }}/terraform_{{ terraform_version }}_linux_amd64.zip
+        dest: "{{ tempfile.path }}/terraform_{{ terraform_version }}_linux_amd64.zip"
+        checksum: "{{ terraform_checksum }}"
+    - name: extract package
+      unarchive:
+        src: "{{ tempfile.path }}/terraform_{{ terraform_version }}_linux_amd64.zip"
+        dest: "{{ tempfile.path }}"
+        remote_src: yes
+    - name: install binary
+      copy:
+        src: "{{ tempfile.path }}/terraform"
+        dest: /usr/local/bin/terraform
+        remote_src: yes
+        mode: 0755
+  always:
+    - name: remove temporary directory
+      file:
+        path: "{{ tempfile.path }}"
+        state: absent

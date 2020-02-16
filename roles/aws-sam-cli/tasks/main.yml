@@ -1,0 +1,25 @@
+- name: check version
+  command: /usr/local/bin/sam --version
+  failed_when: false
+  changed_when: sam.rc > 0 or sam.stdout_lines[0] != "SAM CLI, version " + aws_sam_cli_version
+  register: sam
+- when: sam.changed
+  block:
+    - name: delete old version
+      file:
+        path: /opt/aws-sam-cli
+        state: absent
+    - name: install venv
+      apt:
+        name: python3-venv
+    - name: create venv
+      command: python3 -m venv /opt/aws-sam-cli
+      args:
+        creates: /opt/aws-sam-cli
+    - name: install package
+      command: /opt/aws-sam-cli/bin/pip3 install aws-sam-cli=={{ aws_sam_cli_version }}
+    - name: create symbolic link
+      file:
+        src: /opt/aws-sam-cli/bin/sam
+        dest: /usr/local/bin/sam
+        state: link

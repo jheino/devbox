@@ -1,0 +1,32 @@
+- name: check version
+  command: /usr/local/bin/kustomize version
+  failed_when: false
+  changed_when: kustomize.rc > 0 or kustomize.stdout.split()[0] != '{Version:kustomize/v' + kustomize_version
+  register: kustomize
+- when: kustomize.changed
+  block:
+    - name: create temporary directory
+      tempfile:
+        state: directory
+      register: tempfile
+    - name: download package
+      get_url:
+        url: https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv{{ kustomize_version }}/kustomize_v{{ kustomize_version }}_linux_amd64.tar.gz
+        dest: "{{ tempfile.path }}/kustomize_v{{ kustomize_version }}_linux_amd64.tar.gz"
+        checksum: "{{ kustomize_checksum }}"
+    - name: extract package
+      unarchive:
+        src: "{{ tempfile.path }}/kustomize_v{{ kustomize_version }}_linux_amd64.tar.gz"
+        dest: "{{ tempfile.path }}"
+        remote_src: yes
+    - name: install binary
+      copy:
+        src: "{{ tempfile.path }}/kustomize"
+        dest: /usr/local/bin/kustomize
+        remote_src: yes
+        mode: 0755
+  always:
+    - name: remove temporary directory
+      file:
+        path: "{{ tempfile.path }}"
+        state: absent

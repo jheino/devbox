@@ -1,0 +1,32 @@
+- name: check version
+  command: /usr/local/bin/packer version
+  failed_when: false
+  changed_when: packer.rc > 0 or packer.stdout_lines[0] != "Packer v" + packer_version
+  register: packer
+- when: packer.changed
+  block:
+    - name: create temporary directory
+      tempfile:
+        state: directory
+      register: tempfile
+    - name: download package
+      get_url:
+        url: https://releases.hashicorp.com/packer/{{ packer_version }}/packer_{{ packer_version }}_linux_amd64.zip
+        dest: "{{ tempfile.path }}/packer_{{ packer_version }}_linux_amd64.zip"
+        checksum: "{{ packer_checksum }}"
+    - name: extract package
+      unarchive:
+        src: "{{ tempfile.path }}/packer_{{ packer_version }}_linux_amd64.zip"
+        dest: "{{ tempfile.path }}"
+        remote_src: yes
+    - name: install binary
+      copy:
+        src: "{{ tempfile.path }}/packer"
+        dest: /usr/local/bin/packer
+        remote_src: yes
+        mode: 0755
+  always:
+    - name: remove temporary directory
+      file:
+        path: "{{ tempfile.path }}"
+        state: absent

@@ -1,0 +1,32 @@
+- name: check version
+  command: /usr/local/bin/xsv --version
+  failed_when: false
+  changed_when: xsv.rc > 0 or xsv.stdout_lines[0] != xsv_version
+  register: xsv
+- when: xsv.changed
+  block:
+    - name: create temporary directory
+      tempfile:
+        state: directory
+      register: tempfile
+    - name: download package
+      get_url:
+        url: https://github.com/BurntSushi/xsv/releases/download/{{ xsv_version }}/xsv-{{ xsv_version }}-x86_64-unknown-linux-musl.tar.gz
+        dest: "{{ tempfile.path }}/xsv-{{ xsv_version }}-x86_64-unknown-linux-musl.tar.gz"
+        checksum: "{{ xsv_checksum }}"
+    - name: extract package
+      unarchive:
+        src: "{{ tempfile.path }}/xsv-{{ xsv_version }}-x86_64-unknown-linux-musl.tar.gz"
+        dest: "{{ tempfile.path }}"
+        remote_src: yes
+    - name: install binary
+      copy:
+        src: "{{ tempfile.path }}/xsv"
+        dest: /usr/local/bin/xsv
+        remote_src: yes
+        mode: 0755
+  always:
+    - name: remove temporary directory
+      file:
+        path: "{{ tempfile.path }}"
+        state: absent

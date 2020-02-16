@@ -1,0 +1,34 @@
+- name: check go version
+  command: /usr/local/go/bin/go version
+  failed_when: false
+  changed_when: go.rc > 0 or go.stdout != "go version go" + go_version + " linux/amd64"
+  register: go
+- when: go.changed
+  block:
+    - name: create temporary directory
+      tempfile:
+        state: directory
+      register: tempfile
+    - name: download package
+      get_url:
+        url: https://dl.google.com/go/go{{ go_version }}.linux-amd64.tar.gz
+        dest: "{{ tempfile.path }}/go{{ go_version }}.linux-amd64.tar.gz"
+        checksum: "{{ go_checksum }}"
+    - name: delete old version
+      file:
+        path: /usr/local/go
+        state: absent
+    - name: extract package
+      unarchive:
+        src: "{{ tempfile.path }}/go{{ go_version }}.linux-amd64.tar.gz"
+        dest: /usr/local
+        remote_src: yes
+  always:
+    - name: remove temporary directory
+      file:
+        path: "{{ tempfile.path }}"
+        state: absent
+- name: add go to path
+  copy:
+    content: export PATH=$PATH:/usr/local/go/bin
+    dest: /etc/profile.d/go.sh

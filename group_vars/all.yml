@@ -1,0 +1,11 @@
+docker_users:
+  - "{{ ansible_env.SUDO_USER }}"
+microk8s_users:
+  - "{{ ansible_env.SUDO_USER }}"
+apt_packages:
+  - apcalc
+  - jq
+  - moreutils
+  - mosh
+  - unzip
+  - zip

@@ -1,0 +1,6 @@
+- name: download binary
+  get_url:
+    url: https://amazon-eks.s3-us-west-2.amazonaws.com/{{ aws_iam_authenticator_version }}/bin/linux/amd64/aws-iam-authenticator
+    dest: /usr/local/bin/aws-iam-authenticator
+    checksum: "{{ aws_iam_authenticator_checksum }}"
+    mode: 0755
