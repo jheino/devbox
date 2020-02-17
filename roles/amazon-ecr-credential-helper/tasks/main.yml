@@ -1,0 +1,6 @@
+- name: download binary
+  get_url:
+    url: https://amazon-ecr-credential-helper-releases.s3.us-east-2.amazonaws.com/{{ amazon_ecr_credential_helper_version }}/linux-amd64/docker-credential-ecr-login
+    dest: /usr/local/bin/docker-credential-ecr-login
+    checksum: "{{ amazon_ecr_credential_helper_checksum }}"
+    mode: 0755
