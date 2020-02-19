@@ -1,0 +1,32 @@
+- name: check version
+  command: /usr/local/bin/k9s version --short
+  failed_when: false
+  changed_when: k9s.rc > 0 or k9s.stdout.split()[1] != k9s_version
+  register: k9s
+- when: k9s.changed
+  block:
+    - name: create temporary directory
+      tempfile:
+        state: directory
+      register: tempfile
+    - name: download package
+      get_url:
+        url: https://github.com/derailed/k9s/releases/download/v{{ k9s_version }}/k9s_Linux_x86_64.tar.gz
+        dest: "{{ tempfile.path }}/k9s_Linux_x86_64.tar.gz"
+        checksum: "{{ k9s_checksum }}"
+    - name: extract package
+      unarchive:
+        src: "{{ tempfile.path }}/k9s_Linux_x86_64.tar.gz"
+        dest: "{{ tempfile.path }}"
+        remote_src: yes
+    - name: install binary
+      copy:
+        src: "{{ tempfile.path }}/k9s"
+        dest: /usr/local/bin/k9s
+        remote_src: yes
+        mode: 0755
+  always:
+    - name: remove temporary directory
+      file:
+        path: "{{ tempfile.path }}"
+        state: absent
