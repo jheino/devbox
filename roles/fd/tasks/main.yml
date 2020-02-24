@@ -1,0 +1,32 @@
+- name: check version
+  command: /usr/local/bin/fd --version
+  failed_when: false
+  changed_when: fd.rc > 0 or fd.stdout_lines[0] != 'fd ' + fd_version
+  register: fd
+- when: fd.changed
+  block:
+    - name: create temporary directory
+      tempfile:
+        state: directory
+      register: tempfile
+    - name: download package
+      get_url:
+        url: https://github.com/sharkdp/fd/releases/download/v{{ fd_version }}/fd-v{{ fd_version }}-x86_64-unknown-linux-gnu.tar.gz
+        dest: "{{ tempfile.path }}/fd-v{{ fd_version }}-x86_64-unknown-linux-gnu.tar.gz"
+        checksum: "{{ fd_checksum }}"
+    - name: extract package
+      unarchive:
+        src: "{{ tempfile.path }}/fd-v{{ fd_version }}-x86_64-unknown-linux-gnu.tar.gz"
+        dest: "{{ tempfile.path }}"
+        remote_src: yes
+    - name: install binary
+      copy:
+        src: "{{ tempfile.path }}/fd-v{{ fd_version }}-x86_64-unknown-linux-gnu/fd"
+        dest: /usr/local/bin/fd
+        remote_src: yes
+        mode: 0755
+  always:
+    - name: remove temporary directory
+      file:
+        path: "{{ tempfile.path }}"
+        state: absent
