@@ -24,5 +24,6 @@
       when: not is_wsl
     - packer
     - ripgrep
+    - shellcheck
     - terraform
     - xsv

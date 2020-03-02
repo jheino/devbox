@@ -1,0 +1,32 @@
+- name: check version
+  command: /usr/local/bin/shellcheck -V
+  failed_when: false
+  changed_when: shellcheck.rc > 0 or shellcheck.stdout_lines[1] != 'version\x3A ' + shellcheck_version
+  register: shellcheck
+- when: shellcheck.changed
+  block:
+    - name: create temporary directory
+      tempfile:
+        state: directory
+      register: tempfile
+    - name: download package
+      get_url:
+        url: https://storage.googleapis.com/shellcheck/shellcheck-v{{ shellcheck_version }}.linux.x86_64.tar.xz
+        dest: "{{ tempfile.path }}/shellcheck-v{{ shellcheck_version }}.linux.x86_64.tar.xz"
+        checksum: "{{ shellcheck_checksum }}"
+    - name: extract package
+      unarchive:
+        src: "{{ tempfile.path }}/shellcheck-v{{ shellcheck_version }}.linux.x86_64.tar.xz"
+        dest: "{{ tempfile.path }}"
+        remote_src: yes
+    - name: install binary
+      copy:
+        src: "{{ tempfile.path }}/shellcheck-v{{ shellcheck_version }}/shellcheck"
+        dest: /usr/local/bin/shellcheck
+        remote_src: yes
+        mode: 0755
+  always:
+    - name: remove temporary directory
+      file:
+        path: "{{ tempfile.path }}"
+        state: absent
