@@ -3,13 +3,8 @@
     name: microk8s
     channel: "{{ microk8s_channel }}"
     classic: yes
-- name: wait for readiness
-  command: microk8s.status --wait-ready
-  changed_when: false
-  register: microk8s
-- name: enable addons
-  command: microk8s.enable {{ item }}
-  when: "item + ': disabled' in microk8s.stdout"
+- name: install addons
+  include_tasks: addons.yml
   loop:
     - dns
     - storage

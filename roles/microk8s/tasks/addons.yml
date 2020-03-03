@@ -1,0 +1,7 @@
+- name: wait for readiness
+  command: microk8s.status --wait-ready
+  changed_when: false
+  register: microk8s
+- name: enable addon
+  command: microk8s.enable {{ item }}
+  when: "item + ': disabled' in microk8s.stdout"
