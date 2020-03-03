@@ -12,6 +12,7 @@
     - aws-iam-authenticator
     - aws-sam-cli
     - aws-vault
+    - bat
     - borg
     - docker
     - fd

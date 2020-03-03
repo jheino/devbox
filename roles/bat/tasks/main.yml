@@ -1,0 +1,32 @@
+- name: check version
+  command: /usr/local/bin/bat -V
+  failed_when: false
+  changed_when: bat.rc > 0 or bat.stdout_lines[0] != 'bat ' + bat_version
+  register: bat
+- when: bat.changed
+  block:
+    - name: create temporary directory
+      tempfile:
+        state: directory
+      register: tempfile
+    - name: download package
+      get_url:
+        url: https://github.com/sharkdp/bat/releases/download/v{{ bat_version }}/bat-v{{ bat_version }}-x86_64-unknown-linux-gnu.tar.gz
+        dest: "{{ tempfile.path }}/bat-v{{ bat_version }}-x86_64-unknown-linux-gnu.tar.gz"
+        checksum: "{{ bat_checksum }}"
+    - name: extract package
+      unarchive:
+        src: "{{ tempfile.path }}/bat-v{{ bat_version }}-x86_64-unknown-linux-gnu.tar.gz"
+        dest: "{{ tempfile.path }}"
+        remote_src: yes
+    - name: install binary
+      copy:
+        src: "{{ tempfile.path }}/bat-v{{ bat_version }}-x86_64-unknown-linux-gnu/bat"
+        dest: /usr/local/bin/bat
+        remote_src: yes
+        mode: 0755
+  always:
+    - name: remove temporary directory
+      file:
+        path: "{{ tempfile.path }}"
+        state: absent
