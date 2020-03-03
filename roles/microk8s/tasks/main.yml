@@ -1,6 +1,7 @@
 - name: install snap
   snap:
     name: microk8s
+    channel: "{{ microk8s_channel }}"
     classic: yes
 - name: wait for readiness
   command: microk8s.status --wait-ready
