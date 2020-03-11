@@ -1,2 +1,2 @@
-kubectl_version: "1.14.6/2019-08-22"
-kubectl_checksum: sha256:387caa16fb715db9304bbbef444a94db5b9b1e67a75c478aefe56e9c253fc5c9
+kubectl_version: "1.15.10/2020-02-22"
+kubectl_checksum: sha256:30b9d5c50d0701249270601baff33e4ab353ee2b725f968425852cabb38fda65
