@@ -1,7 +1,7 @@
 - name: check version
   command: /usr/local/bin/rg --version
   failed_when: false
-  changed_when: ripgrep.rc > 0 or ripgrep.stdout_lines[0] != 'ripgrep ' + ripgrep_version
+  changed_when: ripgrep.rc > 0 or ripgrep.stdout.split()[1] != ripgrep_version
   register: ripgrep
 - when: ripgrep.changed
   block:
