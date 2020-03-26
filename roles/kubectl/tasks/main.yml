@@ -1,6 +1,6 @@
 - name: download binary
   get_url:
-    url: https://amazon-eks.s3-us-west-2.amazonaws.com/{{ kubectl_version }}/bin/linux/amd64/kubectl
+    url: https://amazon-eks.s3.us-west-2.amazonaws.com/{{ kubectl_version }}/bin/linux/amd64/kubectl
     dest: /usr/local/bin/kubectl
     checksum: "{{ kubectl_checksum }}"
     mode: 0755
