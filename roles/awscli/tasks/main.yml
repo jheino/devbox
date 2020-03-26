@@ -1,7 +1,7 @@
 - name: check version
   command: /usr/local/bin/aws --version
   failed_when: false
-  changed_when: aws.rc > 0 or aws.stdout.split()[0].split('/')[1] is version(awscli_version, '<')
+  changed_when: aws.rc > 0 or aws.stdout.split()[0] != "aws-cli/" + awscli_version
   register: aws
 - when: aws.changed
   block:
@@ -11,11 +11,12 @@
       register: tempfile
     - name: download package
       get_url:
-        url: https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip
-        dest: "{{ tempfile.path }}/awscli-exe-linux-x86_64.zip"
+        url: https://awscli.amazonaws.com/awscli-exe-linux-x86_64-{{ awscli_version }}.zip
+        dest: "{{ tempfile.path }}/awscli-exe-linux-x86_64-{{ awscli_version }}.zip"
+        checksum: "{{ awscli_checksum }}"
     - name: extract package
       unarchive:
-        src: "{{ tempfile.path }}/awscli-exe-linux-x86_64.zip"
+        src: "{{ tempfile.path }}/awscli-exe-linux-x86_64-{{ awscli_version }}.zip"
         dest: "{{ tempfile.path }}"
         remote_src: yes
     - name: delete old version
