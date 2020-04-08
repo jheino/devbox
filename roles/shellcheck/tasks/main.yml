@@ -11,7 +11,7 @@
       register: tempfile
     - name: download package
       get_url:
-        url: https://storage.googleapis.com/shellcheck/shellcheck-v{{ shellcheck_version }}.linux.x86_64.tar.xz
+        url: https://github.com/koalaman/shellcheck/releases/download/v{{ shellcheck_version }}/shellcheck-v{{ shellcheck_version }}.linux.x86_64.tar.xz
         dest: "{{ tempfile.path }}/shellcheck-v{{ shellcheck_version }}.linux.x86_64.tar.xz"
         checksum: "{{ shellcheck_checksum }}"
     - name: extract package
