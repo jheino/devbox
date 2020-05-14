@@ -22,7 +22,7 @@
     - kubectl
     - kustomize
     - role: microk8s
-      when: not is_wsl
+      when: not is_wsl and ansible_memtotal_mb >= 3876
     - packer
     - pandoc
     - ripgrep
