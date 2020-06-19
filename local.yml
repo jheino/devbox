@@ -2,7 +2,7 @@
   pre_tasks:
     - name: check if we are running under WSL
       set_fact:
-        is_wsl: "{{ 'Microsoft' in ansible_kernel }}"
+        is_wsl: "{{ 'microsoft' in ansible_kernel|lower }}"
     - name: install packages
       apt:
         name: "{{ apt_packages }}"
