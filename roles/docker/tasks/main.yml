@@ -9,6 +9,12 @@
 - name: install docker-ce
   apt:
     name: docker-ce
+- name: install docker-compose
+  get_url:
+    url: https://github.com/docker/compose/releases/download/{{ docker_compose_version }}/docker-compose-Linux-x86_64
+    dest: /usr/local/bin/docker-compose
+    checksum: "{{ docker_compose_checksum }}"
+    mode: 0755
 - name: add users to docker group
   user:
     name: "{{ item }}"
