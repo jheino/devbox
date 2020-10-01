@@ -1,2 +1,2 @@
-aws_vault_version: "5.4.4"
-aws_vault_checksum: sha256:216695e63583296fd7b4202f86479af8da3a7fb00929a22952e9d4bc95fd0d66
+aws_vault_version: "6.2.0"
+aws_vault_checksum: sha256:1d87a634cd22de9c9cf0cbbbd710651622414ecc556e9c91c9acdc5f07329c6e
