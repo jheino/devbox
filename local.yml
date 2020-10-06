@@ -10,6 +10,7 @@
     - amazon-ecr-credential-helper
     - awscli
     - aws-iam-authenticator
+    - awslogs
     - aws-sam-cli
     - aws-vault
     - bat

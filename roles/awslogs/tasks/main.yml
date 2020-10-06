@@ -1,0 +1,25 @@
+- name: check version
+  command: /usr/local/bin/awslogs --version
+  failed_when: false
+  changed_when: awslogs.rc > 0 or awslogs.stdout_lines[0] != "awslogs " + awslogs_version
+  register: awslogs
+- when: awslogs.changed
+  block:
+    - name: delete old version
+      file:
+        path: /opt/awslogs
+        state: absent
+    - name: install venv
+      apt:
+        name: python3-venv
+    - name: create venv
+      command: python3 -m venv /opt/awslogs
+      args:
+        creates: /opt/awslogs
+    - name: install package
+      command: /opt/awslogs/bin/pip3 install awslogs=={{ awslogs_version }}
+    - name: create symbolic link
+      file:
+        src: /opt/awslogs/bin/awslogs
+        dest: /usr/local/bin/awslogs
+        state: link
